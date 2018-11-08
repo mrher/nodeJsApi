@@ -1,7 +1,10 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var mongoClient = require('mongodb').MongoClient;
 
 var app = express();
+var db;
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -25,16 +28,30 @@ app.get('/', function(req, res){
 })
 
 app.get('/artists', function(req, res){
-    res.send(artists);
+    db.collection('artists').find().toArray(function(err, docs){
+        if(err){
+            console.log(err);
+            return res.SendStatus(500);
+        }
+        res.send(docs);
+    })
+    //res.send(artists);
 });
 
 app.post('/artists', function(req, res){
     var artist = {
-        id: Date.now(),
+        //id: Date.now(),
         name: req.body.name
     }
-    artists.push(artist);
-    res.send(artist);
+    db.collection('artists').insert(artist, function(err, result){
+        if (err){
+            console.log(err);
+            return res.sendStatus(500);
+        }
+        res.send(artist);
+    });
+    //artists.push(artist);
+    //res.send(artist);
 })
 
 app.put('/artists/:id', function(req, res){
@@ -61,6 +78,14 @@ app.get('/artists/:id', function(req, res){
     res.send(artist);
 });
 
-app.listen(3012, function(){
-    console.log('API app started on locahost:3012');
-})
+
+
+mongoClient.connect('mongodb://localhost:27017/myApi', { useNewUrlParser: true }, function(err, database){
+    if (err){
+        return console.log(err);
+    }
+    db = database.db('myApi');
+    app.listen(3012, function(){
+        console.log('API app started on locahost:3012');
+    })
+});
