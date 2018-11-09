@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var mongoClient = require('mongodb').MongoClient;
+var ObjectID = require('mongodb').ObjectID;
 
 var app = express();
 var db;
@@ -55,19 +56,40 @@ app.post('/artists', function(req, res){
 })
 
 app.put('/artists/:id', function(req, res){
-    var artist = artists.find(function(artist){
-        return artist.id === Number(req.params.id)
-    });
-    artist.name = req.body.name;
-    //res.send(artist);
-    res.sendStatus(200);
+    db.collection('artists').updateOne(
+        { _id: new ObjectID(req.params.id) },
+        { $set: { name: req.body.name } },
+        function (err, result) {
+            if (err){
+                console.log(err);
+                return res.sendStatus(500);
+            }
+            res.sendStatus(200);
+        }
+    )
+//    var artist = artists.find(function(artist){
+//        return artist.id === Number(req.params.id)
+//    });
+//    artist.name = req.body.name;
+//    //res.send(artist);
+//    res.sendStatus(200);
 })
 
 app.delete('/artists/:id', function(req, res){
-    artists = artists.filter(function(artist){
-       return artist.id !== Number(req.params.id) 
-    })
-    res.sendStatus(200);
+    db.collection('artists').deleteOne(
+        { _id: new ObjectID(req.params.id) },
+        function (err, result) {
+            if (err){
+                console.log(err);
+                return res.sendStatus(500);
+            }
+            res.sendStatus(200);
+        }
+    )
+//    artists = artists.filter(function(artist){
+//       return artist.id !== Number(req.params.id) 
+//    })
+//    res.sendStatus(200);
 })
 
 app.get('/artists/:id', function(req, res){
