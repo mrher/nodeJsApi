@@ -43,7 +43,7 @@ app.post('/artists', function(req, res){
         //id: Date.now(),
         name: req.body.name
     }
-    db.collection('artists').insert(artist, function(err, result){
+    db.collection('artists').insertOne(artist, function(err, result){
         if (err){
             console.log(err);
             return res.sendStatus(500);
