@@ -2,9 +2,9 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
-var db = require('./db');
 
 var app = express();
+var db;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -42,7 +42,7 @@ app.get('/artists', function(req, res){
 app.post('/artists', function(req, res){
     var artist = {
         //id: Date.now(),
-        name: req.body.name
+        name: req.body.name.toString()
     }
     db.collection('artists').insertOne(artist, function(err, result){
         if (err){
@@ -102,10 +102,11 @@ app.get('/artists/:id', function(req, res){
 
 
 
-db.connect('mongodb://localhost:27017/myApi', { useNewUrlParser: true }, function(err){
+mongoClient.connect('mongodb://localhost:27017/myApi', { useNewUrlParser: true }, function(err, database){
     if (err){
         return console.log(err);
     }
+    db = database.db('myApi');
     app.listen(3012, function(){
         console.log('API app started on locahost:3012');
     })

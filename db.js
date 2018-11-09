@@ -9,11 +9,15 @@ exports.connect = function (url, done) {
         return done();
     }
     
-    mongoClient.connect(url, function(err, db){
+    mongoClient.connect(url, { useNewUrlParser: true }, function(err, database){
         if (err){
             return done(err);
         }
-        state.db = db.db('myApi');
+        state.db = database.db('myApi');
         done();
     })
+}
+
+exports.get = function (){
+    return state.db;
 }
